@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from users.models import Reader
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def returns_view(request):
     search_query = request.GET.get('search', '')
     if search_query:

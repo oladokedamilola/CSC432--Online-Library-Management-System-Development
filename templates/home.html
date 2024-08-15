@@ -1,11 +1,62 @@
 {% extends "base.html" %}
-
+{% load static %}
 
 {% block title %} Home {% endblock title %}
 
 {% block content %}
-    <h1>Home</h1>
-    
-    
-    
-{% endblock content %}    
+    <div class="hero-section text-center w-100" style="background: url('{% static 'hero.jpg' %}') no-repeat center center; background-size: cover; height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div class="text-white">
+            <h1 class="display-4">Welcome to the Online Library Management System</h1>
+            <p class="lead">Your one-stop solution for managing library resources efficiently and effectively.</p>
+            {% comment %} <a href="#" class="btn btn-primary btn-lg">Join Now</a> {% endcomment %}
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col text-center">
+                <h1>Explore Our Features</h1>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Manage Readers</h5>
+                        <p class="card-text">Add, update, or remove readers from the system.</p>
+                        <a href="{% url 'reader_manage' %}" class="btn btn-primary">Go to Readers</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Browse Books</h5>
+                        <p class="card-text">Explore our extensive collection of books.</p>
+                        <a href="{% url 'books' %}" class="btn btn-primary">Go to Books</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Manage Your Bag</h5>
+                        <p class="card-text">View and manage books in your bag.</p>
+                        <a href="{% url 'mybag' %}" class="btn btn-primary">Go to MyBag</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Returns</h5>
+                        <p class="card-text">Manage the return of books efficiently.</p>
+                        <a href="{% url 'returns' %}" class="btn btn-primary">Go to Returns</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

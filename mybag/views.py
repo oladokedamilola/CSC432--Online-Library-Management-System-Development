@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from .models import Bag, Reader
 from .forms import BagForm, CheckoutForm
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def mybag(request):
     if request.method == "POST":
         bag_form = BagForm(request.POST)
@@ -42,7 +44,7 @@ def mybag(request):
         'bags': bag_items
     })
 
-
+@login_required
 def checkout(request):
     if request.method == "POST":
         checkout_form = CheckoutForm(request.POST)

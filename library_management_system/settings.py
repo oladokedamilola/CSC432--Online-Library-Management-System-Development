@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'users',
     'books',
     'rest_framework',
+    'corsheaders',
     'django_filters',
     'crispy_forms',
     'allauth',
@@ -58,10 +59,16 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",  
+]
+
 
 ROOT_URLCONF = 'library_management_system.urls'
 
@@ -125,12 +132,18 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = '/librarian/login/'  # Update this to match the correct URL
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

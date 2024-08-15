@@ -1,34 +1,71 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="display: flex;">
-    <!-- Form section -->
-    <div style="flex: 1; margin-right: 20px;">
-        <h2>{% if form.instance.pk %}Edit Reader{% else %}Add Reader{% endif %}</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Save</button>
-        </form>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Form section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2>{% if form.instance.pk %}Edit Reader{% else %}Add Reader{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_number">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div class="form-group">
+                            <label for="reference_id">Reference ID</label>
+                            {{ form.reference_id }}
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="form-group form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="is_active">Is Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- List section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Reader List</h2>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for reader in readers %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ reader.name }}<br>
+                                <small>{{ reader.phone_number }}</small><br>
+                                <small>{{ reader.reference_id }}</small><br>
+                                <small>{{ reader.address }}</small>
+                            </div>
+                            <div>
+                                <a href="{% url 'reader_edit' reader.pk %}" class="btn btn-warning btn-sm mr-2">Edit</a>
+                                <form method="post" action="{% url 'toggle_active' reader.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="checkbox" name="is_active" {% if reader.is_active %}checked{% endif %} 
+                                           onchange="this.form.submit();" class="form-check-input">
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
-
-    <!-- List section -->
-<div style="flex: 2;">
-    <h2>Reader List</h2>
-    <ul>
-        {% for reader in readers %}
-            <li>
-                {{ reader.name }} - {{ reader.phone_number }} - {{ reader.reference_id }} - {{ reader.address }}
-                - <a href="{% url 'reader_edit' reader.pk %}">Edit</a>
-                <form method="post" action="{% url 'toggle_active' reader.pk %}">
-                    {% csrf_token %}
-                    <input type="checkbox" name="is_active" {% if reader.is_active %}checked{% endif %} 
-                           onchange="this.form.submit();">
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
-
 </div>
 {% endblock %}

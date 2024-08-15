@@ -1,25 +1,167 @@
 {% extends 'base.html' %}
 
+{% block title %}Books List{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2>Books List</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Books List</h2>
+
+    <!-- Add New Book Button -->
+    <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#addBookModal">
+        Add New Book
+    </button>
 
     <!-- Search Form -->
-    <form method="GET" action="{% url 'books' %}">
-        <input type="text" name="query" placeholder="Search for books">
-        <button type="submit">Search</button>
+    <form method="GET" action="{% url 'books' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="query" class="form-control" placeholder="Search for books">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
     </form>
 
-    <ul>
-        {% for book in books %}
-            <li>
-                {{ book.title }} by {{ book.author }}
-                <form method="POST" action="{% url 'add_to_bag' book.pk %}">
-                    {% csrf_token %}
-                    <button type="submit">Add to Bag</button>
-                </form>
-            </li>
+    <!-- Book List -->
+    <div class="row">
+        {% for book in page_obj %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text">Genre: {{ book.genre }}</p>
+                        <p class="card-text">Copies available: {{ book.copies_available }}</p>
+                        <form method="POST" action="{% url 'add_to_bag' book.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">Add to Bag</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_next or page_obj.paginator.count > page_obj.paginator.per_page %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
 </div>
+
+<!-- Modal for Adding New Book -->
+<div class="modal fade" id="addBookModal" tabindex="-1" role="dialog" aria-labelledby="addBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBookModalLabel">Add New Book</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'books' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_title">Title</label>
+                        <input type="text" name="title" id="id_title" class="form-control" placeholder="Title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_author">Author</label>
+                        <input type="text" name="author" id="id_author" class="form-control" placeholder="Author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_isbn">ISBN</label>
+                        <input type="text" name="isbn" id="id_isbn" class="form-control" placeholder="ISBN" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_publication_date">Publication Date</label>
+                        <input type="date" name="publication_date" id="id_publication_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_genre">Genre</label>
+                        <input type="text" name="genre" id="id_genre" class="form-control" placeholder="Genre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_copies_available">Copies Available</label>
+                        <input type="number" name="copies_available" id="id_copies_available" class="form-control" placeholder="Copies Available" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_cover_image">Cover Image</label>
+                        <input type="file" name="cover_image" id="id_cover_image" class="form-control-file">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_book_file">Book File</label>
+                        <input type="file" name="book_file" id="id_book_file" class="form-control-file">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Book</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<!-- JavaScript for Bootstrap Modal -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 {% endblock %}

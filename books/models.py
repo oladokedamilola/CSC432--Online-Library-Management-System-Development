@@ -7,6 +7,8 @@ class Book(models.Model):
     publication_date = models.DateField()
     genre = models.CharField(max_length=100)
     copies_available = models.IntegerField()
+    cover_image = models.ImageField(upload_to='book_covers/', blank=True, null=True)
+    book_file = models.FileField(upload_to='books_files/', blank=True, null=True)
 
     def __str__(self):
         return self.title

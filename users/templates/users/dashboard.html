@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome, {{ librarian_name }}!</h1>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Total Books</h5>
+                    <p>{{ total_books }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Active Readers</h5>
+                    <p>{{ active_readers }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Books Borrowed Today</h5>
+                    <p>{{ borrowed_today }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Overdue Books</h5>
+                    <p>{{ overdue_books }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Quick Actions</h2>
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'reader_manage' %}" class="btn btn-secondary btn-block">Manage Readers</a>
+        </div>
+        
+    </div>
+
+    <h2>Recent Activities</h2>
+    <ul>
+        {% for activity in recent_activities %}
+            <li>{{ activity }}</li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endblock %}
