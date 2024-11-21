@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Apply consistent styling to all select fields */
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;  /* Adequate padding to ensure proper text visibility */
+    font-size: 16px;  /* Set a readable font size */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-sizing: border-box;  /* Prevent overflow */
+    height: auto;  /* Allow the height to adjust naturally */
+    line-height: 1.5;  /* Provide better spacing for text */
+}
+
+/* Label styling */
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;  /* Ensure the label appears on top of the select */
+    padding-bottom: 5px;  /* Provide some spacing between label and select field */
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;  /* Display the error message if there's an error */
+}
+
+/* Optional: Additional focus styles for select elements */
+.form-group select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+    /* Styling for the password criteria */
+    .password-criteria p {
+        font-size: 0.9rem;
+        margin-top: 10px;
+        color: #555;
+    }
+    #passwordCriteria {
+        list-style-type: none;
+        padding: 0;
+    }
+    .criteria {
+        color: #e74c3c; /* Red for unfulfilled criteria */
+    }
+    .criteria.fulfilled {
+        color: #2ecc71; /* Green for fulfilled criteria */
+    }
+    .match {
+        color: #2ecc71; /* Green for matching passwords */
+    }
+    /* Container styling */
+    .container {
+        max-width: 500px;
+        margin: 90px auto;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Form control styles */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .btn {
+        margin-top: 15px;
+        width: 100px;
+    }
+
+    /* Form control styles (without error by default) */
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    /* Error styles for form controls */
+    .form-control.error {
+        border-color: #e74c3c; /* Red border color for errors */
+        box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); /* Light shadow for error */
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+
+    /* Error message styling */
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: none; /* Hide error messages by default */
+    }
+</style>
+
+<div class="container">
+    <form id="registrationForm" method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        
+        <!-- Personal Information -->
+        <h3>Create an account</h3>
+
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" name="first_name" class="form-control {% if form.first_name.errors and request.method == 'POST' %}error{% endif %}" id="first_name" value="{{ form.first_name.value|default:'' }}">
+            <div class="error-message {% if form.first_name.errors and request.method == 'POST' %}show{% endif %}">
+                {% for error in form.first_name.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" name="last_name" class="form-control {% if form.last_name.errors and request.method == 'POST' %}error{% endif %}" id="last_name" value="{{ form.last_name.value|default:'' }}">
+            <div class="error-message {% if form.last_name.errors and request.method == 'POST' %}show{% endif %}">
+                {% for error in form.last_name.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" class="form-control {% if form.username.errors and request.method == 'POST' %}error{% endif %}" id="username" value="{{ form.username.value|default:'' }}">
+            <div class="error-message {% if form.username.errors and request.method == 'POST' %}show{% endif %}">
+                {% for error in form.username.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" class="form-control {% if form.email.errors and request.method == 'POST' %}error{% endif %}" id="email" value="{{ form.email.value|default:'' }}">
+            <div class="error-message {% if form.email.errors and request.method == 'POST' %}show{% endif %}">
+                {% for error in form.email.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Location and Password -->
+        <div class="form-group">
+            <label for="country">Country</label>
+            <select name="country" class="form-control {% if form.country.errors and request.method == 'POST' %}error{% endif %}" id="country">
+                <option value="">Select your country</option>
+                {% for country_code, country_name in countries %}
+                    <option value="{{ country_code }}" {% if form.country.value == country_code %}selected{% endif %}>{{ country_name }}</option>
+                {% endfor %}
+            </select>
+            <div class="error-message {% if form.country.errors and request.method == 'POST' %}show{% endif %}">
+                {% for error in form.country.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Password Field -->
+        <div class="form-group">
+            <label for="password1">Password</label>
+            <div class="input-group">
+                <input type="password" name="password1" class="form-control" id="password1">
+                <div class="input-group-append">
+                    <span class="input-group-text" onclick="togglePassword('password1')" style="cursor: pointer;">
+                        <i class="fa fa-eye" id="togglePasswordIcon"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="password-criteria">
+                <p>Password must meet the following criteria:</p>
+                <ul id="passwordCriteria">
+                    <li id="minLength" class="criteria">At least 8 characters</li>
+                    <li id="letter" class="criteria">Contains a letter</li>
+                    <li id="number" class="criteria">Contains a numeral</li>
+                    <li id="specialChar" class="criteria">Contains a special character (!@#$%^&*()-+)</li>
+                </ul>
+            </div>
+            <div class="error-message">
+                {% for error in form.password1.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+            <label for="password2">Confirm Password</label>
+            <div class="input-group">
+                <input type="password" name="password2" class="form-control {% if form.password2.errors and request.method == 'POST' %}error{% endif %}" id="password2" value="{{ form.password2.value|default:'' }}">
+                <div class="input-group-append">
+                    <span class="input-group-text" onclick="togglePassword('password2')">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+                <!-- Confirm Password Match Message below the input-group -->
+                <div id="confirmPasswordMessage" class="error-message" style="margin-top: 5px;"></div>            </div>
+            <div class="error-message {% if form.password2.errors and request.method == 'POST' %}show{% endif %}">
+                {% for error in form.password2.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <div class="text-center mt-3">
+        <p>
+            Already have an account? <a href="{% url 'login' %}">Login here</a>.
+        </p>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    function togglePassword(inputId) {
+        const passwordField = document.getElementById(inputId);
+        const icon = passwordField.nextElementSibling.querySelector('i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+    
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const passwordField = document.getElementById("password1");
+        const confirmPasswordField = document.getElementById("password2");
+        const confirmPasswordMessage = document.getElementById("confirmPasswordMessage");
+
+        // Password criteria elements
+        const minLengthEl = document.getElementById("minLength");
+        const letterEl = document.getElementById("letter");
+        const numberEl = document.getElementById("number");
+        const specialCharEl = document.getElementById("specialChar");
+
+        passwordField.addEventListener("input", function() {
+            const password = passwordField.value;
+
+            // Check each criterion and update its status
+            if (password.length >= 8) {
+                minLengthEl.classList.add("fulfilled");
+            } else {
+                minLengthEl.classList.remove("fulfilled");
+            }
+
+            if (/[a-zA-Z]/.test(password)) {
+                letterEl.classList.add("fulfilled");
+            } else {
+                letterEl.classList.remove("fulfilled");
+            }
+
+            if (/\d/.test(password)) {
+                numberEl.classList.add("fulfilled");
+            } else {
+                numberEl.classList.remove("fulfilled");
+            }
+
+            if (/[!@#$%^&*()\-+]/.test(password)) {
+                specialCharEl.classList.add("fulfilled");
+            } else {
+                specialCharEl.classList.remove("fulfilled");
+            }
+
+            // Check if confirm password matches in real-time
+            checkPasswordMatch();
+        });
+
+        confirmPasswordField.addEventListener("input", checkPasswordMatch);
+
+        function checkPasswordMatch() {
+            const password = passwordField.value;
+            const confirmPassword = confirmPasswordField.value;
+
+            if (confirmPassword === password) {
+                confirmPasswordMessage.textContent = "Passwords match";
+                confirmPasswordMessage.classList.add("match");
+                confirmPasswordMessage.classList.remove("error-message");
+            } else {
+                confirmPasswordMessage.textContent = "Passwords do not match";
+                confirmPasswordMessage.classList.add("error-message");
+                confirmPasswordMessage.classList.remove("match");
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+
+
+
+{% block footer %}
+ <!-- Footer Bottom -->
+ <div style="background: rgba(0, 0, 0, 0.85);" class="text-white text-center py-3">  <!-- Semi-transparent black -->
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+
+{% endblock footer %}
+       

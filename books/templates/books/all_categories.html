@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px; margin-bottom:200px;">
+    <h1 class="text-center mb-4">Categories</h1>
+    <div class="row">
+        {% for category in categories %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <!-- Display the icon if it exists -->
+                        {% if category.icon %}
+                            <i class="{{ category.icon }}" style="font-size: 40px;"></i>
+                        {% endif %}
+                        
+                        <h5 class="card-title mt-3">
+                            <a href="{% url 'category_books' category.id %}">{{ category.name }}</a>
+                        </h5>
+                        
+                        <!-- Display the description if it exists -->
+                        {% if category.description %}
+                            <p class="card-text">{{ category.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center">No categories available at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

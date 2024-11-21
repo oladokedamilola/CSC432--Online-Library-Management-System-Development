@@ -8,7 +8,12 @@
     <title>
         Online Library Management System - {% block title %} {% endblock title %}
     </title>
+    <!-- Bootstrap 4.5.2 CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css" rel="stylesheet">
+
+
     <link rel="icon" href="{% static 'fav.png' %}" type="image/x-icon">
     <style>
         html, body {
@@ -20,6 +25,36 @@
             display: flex;
             flex-direction: column;
         }
+        .flash-message-container {
+            position: fixed;
+            top: 60px; /* Adjust this to match the height of your navbar */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%; /* Set a standard width */
+            max-width: 600px; /* Prevent it from being too wide */
+            z-index: 1050; /* Ensure it appears above other elements */
+        }
+        .flash-message-wrapper {
+            padding: 10px;
+        }
+        .alert {
+            margin: 0 auto;
+            text-align: center;
+            width: 100%;
+        }
+        /* Default style for flash messages */
+.flash-message-container .alert {
+    background-color: #f8f9fa; /* Light gray, Bootstrap's default */
+    color: #212529; /* Dark text for readability */
+    border: 1px solid #dee2e6; /* Subtle border */
+}
+
+/* Style for messages with no specific bg color (fallback) */
+.flash-message-container .alert:not([class*="alert-"]) {
+    background-color: #e2e3e5; /* Subtle gray for undefined types */
+    color: #000; /* Black text */
+}
+
         .content {
             flex: 1;
         }
@@ -39,73 +74,86 @@
             padding: 2px 6px;
             font-size: 12px;
         }
+        {% block styles %}
+
+        {% endblock styles %}
     </style>
 </head>
 <body>
     <div class="wrapper">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        {% block nav %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-custom fixed-top bg-dark">
             <a class="navbar-brand" href="{% url 'home' %}">Online Library Management System</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    {% if user.is_authenticated %}
-                    <!-- Links visible only when logged in -->
+                    <!-- Home link is visible to all users, but not on the home page -->
                     <li class="nav-item">
-                        {% if request.path != '/' %}
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
-                        {% endif %}
                     </li>
+        
+                    <!-- Books link is visible to all users -->
                     <li class="nav-item">
-                        {% if request.path != '/users/librarian/dashboard/' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'librarian_dashboard' %}">Dashboard</a>
-                            </li>
-                        {% endif %}
-
-                    </li>
-
-                    <li class="nav-item">
-                        {% if request.path != '/readers/' %}
-                        <a class="nav-link" href="{% url 'reader_manage' %}">Readers</a>
-                        {% endif %}
-                    </li>
-                    <li class="nav-item">
-                        {% if request.path != '/books/' %}
                         <a class="nav-link" href="{% url 'books' %}">Books</a>
-                        {% endif %}
                     </li>
                     <li class="nav-item">
-                        {% if request.path != '/returns/' %}
-                        <a class="nav-link" href="{% url 'returns' %}">Returns</a>
-                        {% endif %}
+                        <a class="nav-link" href="{% url 'genre_books' %}">Genre</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link cart-indicator" href="#" data-toggle="modal" data-target="#cartModal">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-count">{{ request.session.cart|length }}</span>
-                        </a>
+                        <a class="nav-link" href="{% url 'category_books' %}">Category</a>
+                    </li>
+        
+                    {% if user.is_authenticated %}
+                    <!-- Links visible only to logged-in users -->
+        
+                    <!-- Profile link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'librarian_logout' %}">Logout</a>
+                        <a class="nav-link" href="{% url 'search_books' %}">Search</a>
                     </li>
+        
+                    <!-- Admin link (only for admin users) -->
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                    {% endif %}
+        
+                    <!-- Logout link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+        
                     {% else %}
-                    <!-- Login link visible when not logged in -->
+                    <!-- Links visible only when the user is not logged in -->
+        
+                    <!-- Login link -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'librarian_login' %}">Login</a>
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
                     </li>
+        
+                    <!-- Register link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+        
                     {% endif %}
                 </ul>
             </div>
         </nav>
         
+        {% endblock nav %}
+    
 
-        <div class="container content" style="padding-top: 70px;">
+        <div class="flash-message-container">
             {% if messages %}
-                <div class="mt-2">
+                <div class="flash-message-wrapper">
                     {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="alert alert-{{ message.tags|default:"secondary" }} alert-dismissible fade show" role="alert">
                             {{ message }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -114,67 +162,82 @@
                     {% endfor %}
                 </div>
             {% endif %}
-
-            {% block content %}
-            {% endblock content %}
         </div>
+        
 
-        <footer class="bg-dark text-white mt-5 p-4 text-center">
-            <p>&copy; 2024 Online Library Management System. All rights reserved.</p>
-            <p>
-                <a href="{% url 'home' %}" class="text-white">Home</a> |
-                <a href="{% url 'reader_manage' %}" class="text-white">Readers</a> |
-                <a href="{% url 'books' %}" class="text-white">Books</a> |
-                <a href="{% url 'mybag' %}" class="text-white">MyBag</a> |
-                <a href="{% url 'returns' %}" class="text-white">Returns</a>
-            </p>
-            <p>Contact us: <a href="mailto:info@onlinelibrary.com" class="text-white">info@onlinelibrary.com</a></p>
-        </footer>
-    </div>
+        
+        {% block content %}
+        {% endblock content %}
 
-    <!-- Cart Modal -->
-    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cartModalLabel">My Bag</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="cartContent">
-                        <!-- Cart items will be loaded here via AJAX -->
+{% block footer %}
+<footer class="bg-dark text-white mt-5 p-4">
+    <div class="container">
+        <div class="row">
+            <!-- Quick Links Section -->
+            <div class="col-md-4 mb-3">  <!-- Reduced to col-md-4 -->
+                <h5>Quick Links</h5>
+                <p>
+                    <a href="{% url 'home' %}" class="text-white">Home</a><br>
+                    <a href="{% url 'books' %}" class="text-white">Books</a><br>
+                    
+                </p>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="col-md-4 mb-3">  <!-- Reduced to col-md-4 -->
+                <h5>Contact Us</h5>
+                <p>Email: <a href="mailto:info@onlinelibrary.com" class="text-white">info@onlinelibrary.com</a></p>
+                <p>Follow us on:</p>
+                <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+
+            <!-- Newsletter Subscription Section -->
+            <div class="col-md-4 text-end mb-3">  <!-- New col-md-4 for alignment -->
+                <h5 class="d-inline">Subscribe to Our Newsletter</h5>
+                <form action="#" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <div class="input-group justify-content-end" style="max-width: 300px;">
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                        <button class="btn btn-primary" type="submit">Subscribe</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
-                </div>
+                </form>
             </div>
         </div>
     </div>
+</footer>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock footer %}
+       
+    
+
+    <!-- jQuery, Popper.js, and Bootstrap 4.5.2 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Full version of jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap bundle with Popper.js -->
+
     <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- Font Awesome Kit -->
 
     <script>
-        $(document).ready(function() {
-            $('#cartModal').on('show.bs.modal', function (e) {
-                $.ajax({
-                    url: "{% url 'mybag_modal' %}",
-                    type: "GET",
-                    success: function(data) {
-                        $('#cartContent').html(data);
-                    }
-                });
+        // Auto-hide flash message after 7 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.flash-message-wrapper .alert').forEach(function(alert) {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                setTimeout(() => alert.remove(), 150); // Remove from DOM after fade effect
             });
-        });
+        }, 7000);
     </script>
 
     {% block extrajs %}
     {% endblock extrajs %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+
 </body>
 </html>

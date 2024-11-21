@@ -1,0 +1,57 @@
+/* Custom gradient background for navbar */
+.bg-gradient-custom {
+    background: linear-gradient(to right, #6a11cb, #2575fc); /* Gradient from purple to blue */
+    height: 80px; /* Increased height */
+    transition: background-color 0.3s ease; /* Smooth transition for background */
+}
+
+/* Styling the navbar brand */
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff !important;
+}
+
+/* Navbar link styles */
+.navbar-nav .nav-link {
+    color: #fff !important;
+    font-size: 1.1rem;
+    padding: 12px 25px;
+    text-transform: uppercase; /* Capitalizing the text */
+    font-weight: 500;
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Navbar link hover effect */
+.navbar-nav .nav-link:hover {
+    color: #f8f9fa !important; /* Lighter text color on hover */
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle hover background */
+    border-radius: 25px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Smooth shadow effect */
+}
+
+/* Navbar toggle button (hamburger) color */
+.navbar-toggler-icon {
+    background-color: #fff;
+}
+
+/* Box-shadow effect when scrolling */
+.navbar {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15); /* Adds a shadow to make it stand out */
+}
+
+/* Styling for active links */
+.navbar-nav .nav-item.active .nav-link {
+    font-weight: bold;
+    color: #f8f9fa !important;
+    background-color: rgba(255, 255, 255, 0.15); /* Slight background on active link */
+}
+
+/* Responsive design tweaks for smaller screens */
+@media (max-width: 991px) {
+    .bg-gradient-custom {
+        height: 70px; /* Adjust height on small screens */
+    }
+}

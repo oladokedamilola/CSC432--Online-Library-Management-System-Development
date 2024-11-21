@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .book-description {
+        font-size: 1.2rem;            /* Increase font size */
+        line-height: 1.6;             /* Improve line spacing */
+        color: #555;                 /* Set a slightly darker color for readability */
+        font-family: 'Arial', sans-serif; /* Set a clean font family */
+        text-align: justify;         /* Justify the text */
+        margin-top: 10px;             /* Add some space at the top */
+        margin-bottom: 20px;         /* Add space at the bottom */
+        padding: 10px 15px;          /* Add some padding */
+        background-color: #f9f9f9;   /* Set a light background color */
+        border-left: 5px solid #4CAF50; /* Add a left border for emphasis */
+    }
+    
+</style>
+<div class="container" style="margin-top: 100px">
+    <div class="row">
+        <!-- Book Cover -->
+        <div class="col-md-4 text-center">
+            <img src="{{ book.cover_image.url }}" alt="Cover image" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: cover;">
+        </div>
+
+        <!-- Book Details -->
+        <div class="col-md-8">
+            <h2 class="mb-3">{{ book.title }}</h2>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Genre:</strong>
+                {% for genre in book.genre.all %}
+                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>            <p><strong>Category:</strong> {{ book.category.name }}</p>
+            <p><strong>Published on:</strong> {{ book.publication_date }}</p>
+            <p><strong>Description:</strong></p>
+            <p class="book-description">{{ book.description }}</p>
+           <!-- Action Buttons -->
+          <div class="d-flex mt-4">
+            <a href="{% url 'download_book' book.id %}" class="btn btn-primary me-3" onclick="updateBookStatus('downloaded')" id="download-btn">
+                <i class="fas fa-download"></i> {% if userbook.downloaded %} Download PDF {% else %} Download PDF {% endif %}
+            </a>
+            <a href="{% url 'read_book' book.id %}" class="btn btn-success" id="read-btn">
+                <i class="fas fa-book-open"></i> {% if userbook.read %} Read {% else %} Read Online {% endif %}
+            </a>
+          </div>
+
+            <!-- Like Button -->
+            {% if user.is_authenticated %}
+                <div class="mt-4">
+                    <button id="like-btn" class="btn btn-outline-primary" onclick="updateBookStatus('liked')">
+                        <i id="like-icon" class="fas fa-thumbs-up"></i> {% if userbook.liked %} Liked {% else %} Like {% endif %}
+                    </button>
+                </div>
+            {% else %}
+                <p>Please log in to mark this book as liked.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function downloadBook(bookId) {
+        // Perform the download using AJAX to avoid page reload
+        fetch(`/download/${bookId}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',  // Let the backend know this is an AJAX request
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value  // CSRF token for security
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();  // If successful, get the file blob
+            } else {
+                throw new Error('Download failed');
+            }
+        })
+        .then(blob => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);  // Create an object URL for the blob
+            link.download = 'book.pdf';  // Set a default name for the downloaded file
+            link.click();  // Trigger the download by clicking the link
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+    function updateBookStatus(field) {
+        // Construct the URL dynamically using Django template tag and JavaScript
+        const updateBookUrl = "{% url 'update_book_status' book.id 'FIELD' %}".replace('FIELD', field);
+    
+        // Make an AJAX call to update the book status (liked, read, or downloaded)
+        fetch(updateBookUrl, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Network response was not ok');
+        }).then(data => {
+            // Update the UI based on the response
+            if (field === 'liked') {
+                const likeButton = document.getElementById("like-btn");
+                const likeIcon = document.getElementById("like-icon");
+    
+                // Toggle the liked status and button text
+                if (data.liked) {
+                    likeButton.innerHTML = '<i class="fas fa-thumbs-up"></i> Liked';
+                    likeButton.classList.add('btn-success');
+                    likeButton.classList.remove('btn-outline-primary');
+                } else {
+                    likeButton.innerHTML = '<i class="fas fa-thumbs-up"></i> Like';
+                    likeButton.classList.remove('btn-success');
+                    likeButton.classList.add('btn-outline-primary');
+                }
+            } else if (field === 'read') {
+                const readButton = document.querySelector("a[onclick*='read']");
+  
+                // Update the "Read" button once the book is marked as read
+                if (data.read) {
+                    readButton.innerHTML = '<i class="fas fa-book-open"></i> Read';
+                    readButton.classList.add('btn-secondary');  // Change color to indicate it's read
+                    readButton.classList.remove('btn-success');
+                } else {
+                    readButton.innerHTML = '<i class="fas fa-book-open"></i> Read Online';
+                }
+            } else if (field === 'downloaded') {
+                const downloadButton = document.querySelector("a[onclick*='downloaded']");
+  
+                // Prevent background color change when downloading
+                if (data.downloaded) {
+                    downloadButton.innerHTML = '<i class="fas fa-download"></i> Downloaded'; // You can change text here
+                    // No color change: removed `btn-secondary` and `btn-primary` class toggle
+                } else {
+                    downloadButton.innerHTML = '<i class="fas fa-download"></i> Download PDF';  // Keep text the same
+                }
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
+  </script>
+  
+  
+{% endblock %}
+
+
+
+{% block footer %}
+ <!-- Footer Bottom -->
+ <div style="background: rgba(0, 0, 0, 0.85); margin-top: 90px" class="text-white text-center py-3">  <!-- Semi-transparent black -->
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+
+{% endblock footer %}

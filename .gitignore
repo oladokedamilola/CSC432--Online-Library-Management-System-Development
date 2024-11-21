@@ -1,8 +1,86 @@
-node_modules
-venv
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.db
 
+# Django-specific
+*.log
+*.pot
+*.py[cod]
 db.sqlite3
+/db.sqlite3-journal
 
-library_management_system/
+# Static files
+/static/
+*.static/
 
-migrations*
+# Media files
+/media/
+
+# Django migrations
+*/migrations/*
+
+# .env files for environment variables (never commit sensitive data)
+.env
+
+# VSCode settings
+.vscode/
+
+# IDEs
+.idea/
+*.iml
+
+# Python virtual environment
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Coverage reports
+.coverage
+*.coverage
+*.coveragerc
+nosetests.xml
+coverage.xml
+*.cover
+
+# Distribution / Packaging
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+lib/
+lib64/
+share/python*/site-packages/
+
+# Sphinx documentation
+docs/_build/
+
+# PyCharm
+.idea/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# mypy
+.mypy_cache/
+
+# VSCode
+.history/
+
+# JetBrains
+.idea/
+
+# MacOS-specific files
+.DS_Store
+
+# Windows-specific files
+Thumbs.db
+
+book_covers

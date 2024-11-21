@@ -1,63 +1,352 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Online Library Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'fav.png' %}" type="image/x-icon">
 
-{% block content %}
-<div class="container">
-    <h1>Welcome, {{ librarian_name }}!</h1>
-
-    <div class="row">
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Total Books</h5>
-                    <p>{{ total_books }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Active Readers</h5>
-                    <p>{{ active_readers }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Books Borrowed Today</h5>
-                    <p>{{ borrowed_today }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Overdue Books</h5>
-                    <p>{{ overdue_books }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <h2>Quick Actions</h2>
-    <div class="row">
-        <div class="col-md-4">
-        </div>
-        <div class="col-md-4">
-            <a href="{% url 'reader_manage' %}" class="btn btn-secondary btn-block">Manage Readers</a>
-        </div>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
         
+        /* Sidebar styling */
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding-top: 30px;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            display: block;
+            transition: 0.3s;
+        }
+        
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        
+        /* Main content adjustment */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .card-body {
+            background-color: #f9f9f9;
+        }
+        
+        .navbar {
+            background-color: #343a40;
+        }
+        
+        .navbar-brand {
+            color: white;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background-color: #575757;
+        }
+        
+        /* Hidden Sidebar (for toggling) */
+        .sidebar-hidden {
+            transform: translateX(-250px);
+        }
+        
+        .sidebar-hidden ~ .main-content {
+            margin-left: 0;
+        }
+        
+        /* Sidebar Toggle Button */
+        .sidebar-toggle-btn {
+            position: absolute;
+            top: 20px; /* Adjust vertical position (distance from the top of the page) */
+            left: 50px; /* Adjust horizontal position (distance from the left side of the page) */
+            z-index: 1001;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+        /* Adjusting the icon inside the sidebar toggle button */
+        .sidebar-toggle-btn i {
+            position: absolute;
+            left: -39px;  /* Adjust the horizontal position of the icon */
+            top: 51px;     /* Move the icon further down */
+            transform: translateY(-50%);  /* Fine-tune vertical alignment */
+            color: #007bff; 
+        }
+        /* Push the entire sidebar content down */
+        .sidebar {
+            padding-top: 50px;  /* Add space at the top of the sidebar */
+        }
+
+        /* Adjust the position of links and other elements inside the sidebar */
+        .sidebar a {
+            padding: 12px 15px;
+        }
+        
+        /* For smaller screens, show the toggle button */
+        @media (max-width: 991px) {
+            .sidebar-toggle-btn {
+                display: block !important; /* Ensure the toggle button is visible */
+            }
+        }
+        
+        /* For larger screens (desktop), hide the toggle button */
+        @media (min-width: 992px) {
+            .sidebar-toggle-btn {
+                display: none; /* Hide the toggle button on larger screens */
+            }
+        }
+    </style>
+    
+    
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Online Library</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'books' %}">Books</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+
+
+        </ul>
     </div>
+</nav>
 
-    <h2>Recent Activities</h2>
-    <ul>
-        {% for activity in recent_activities %}
-            <li>{{ activity }}</li>
-        {% endfor %}
-    </ul>
+<!-- Dashboard Layout -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Toggle Button (outside the sidebar) -->
+        <button class="sidebar-toggle-btn" id="sidebarToggle">
+            <i class="fas fa-times"></i> <!-- Close icon -->
+        </button>
 
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar" id="sidebar">
+            <h4 class="text-center text-white">User Dashboard</h4>
+            <a href="#">Dashboard Overview</a>
+            <a href="#Profile">My Profile</a>
+            <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#favoritesModal">Favorites</a>
+            <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#downloadedModal">Downloaded Books</a>
+            <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#readModal">Read Books</a>
+            <a href="#Settings">Settings</a>
+        </div>
+
+
+        <!-- Main Content -->
+        <div class="col-md-9 main-content">
+            <div class="row">
+                <!-- Profile Summary Card -->
+<div class="col-md-6 mx-auto"> <!-- Centered and wider -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-user" id="Profile"></i> Profile Summary
+        </div>
+        <div class="card-body text-center"> <!-- Centering the image -->
+            <!-- Profile Image -->
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" class="img-fluid rounded-circle mb-3" alt="Profile Picture" style="width: 150px; height: 150px;">
+            {% else %}
+                <img src="{% static 'images/default_profile.jpg' %}" class="img-fluid rounded-circle mb-3" alt="Default Profile Picture" style="width: 120px; height: 120px;">
+            {% endif %}
+
+
+            
+            <!-- User Information -->
+            <h5 class="mt-3">{{ user.first_name }} {{ user.last_name }}</h5>
+            <p class="text-start">Email: {{ user.email }}</p>
+            <p class="text-start">Country: {{ user.country }}</p>
+            <p class="text-start">Reference ID: {{ user.reference_id }}</p>
+        </div>
+    </div>
 </div>
-{% endblock %}
+
+            </div>
+
+<!-- Modal for Favorites -->
+<div class="modal fade" id="favoritesModal" tabindex="-1" aria-labelledby="favoritesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="favoritesModalLabel">Favorite Books</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% for user_book in liked_books %}
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <img src="{{ user_book.book.cover_image.url }}" class="card-img-top" alt="{{ user_book.book.title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ user_book.book.title }} by {{ user_book.book.author }}</h5>
+                                    <p class="card-text">{{ user_book.book.description }}</p>
+                                    <a href="{% url 'book_detail' user_book.book.id %}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No favorite books found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Downloaded Books -->
+<div class="modal fade" id="downloadedModal" tabindex="-1" aria-labelledby="downloadedModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadedModalLabel">Downloaded Books</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% for user_book in downloaded_books %}
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <img src="{{ user_book.book.cover_image.url }}" class="card-img-top" alt="{{ user_book.book.title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ user_book.book.title }} <small class="text-muted">by {{ user_book.book.author }}</small></h5>
+                                    <p class="card-text">{{ user_book.book.description }}</p>
+                                    <a href="{% url 'book_detail' user_book.book.id %}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No downloaded books found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Read Books -->
+<div class="modal fade" id="readModal" tabindex="-1" aria-labelledby="readModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="readModalLabel">Read Books</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% for user_book in read_books %}
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <img src="{{ user_book.book.cover_image.url }}" class="card-img-top" alt="{{ user_book.book.title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ user_book.book.title }} <small class="text-muted">by {{ user_book.book.author }}</small></h5>
+                                    <p class="card-text">{{ user_book.book.description }}</p>
+                                    <a href="{% url 'book_detail' user_book.book.id %}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No read books found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <!-- Settings or Additional Features Section -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-cogs" id="Settings"></i> Account Settings
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile' %}">
+                                {% csrf_token %}
+                                
+                                <!-- Profile Image -->
+                                <div class="form-group">
+                                    <label for="profile_image">Profile Image:</label>
+                                    <input type="file" class="form-control" id="profile_image" name="profile_image">
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">Update Profile</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Toggle Sidebar
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+        var sidebar = document.getElementById('sidebar');
+        var mainContent = document.getElementById('mainContent');
+        var icon = document.querySelector('#sidebarToggle i');  // Access the icon within the button
+
+        // Toggle the sidebar visibility
+        sidebar.classList.toggle('sidebar-hidden');
+        
+        // Toggle the icon
+        if (sidebar.classList.contains('sidebar-hidden')) {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        } else {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        }
+
+        // Toggle the main content margin when sidebar is hidden
+        mainContent.classList.toggle('sidebar-expanded');
+    });
+</script>
+</body>
+</html>

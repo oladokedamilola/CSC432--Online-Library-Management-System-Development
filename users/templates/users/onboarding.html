@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="{% url 'home' %}">Online Library Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+            <!-- Logout link -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+            
+            {% else %}
+            <!-- Links visible only when the user is not logged in -->
+
+            <!-- Login link -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+
+            <!-- Register link -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endblock nav %}
+
+
+{% block content %}
+<style>
+    #section-2 .form-card {
+        margin-top: 20px; /* Adjust top margin */
+        margin-bottom: 20px; /* Adjust bottom margin */
+    }
+    
+    /* Center the container on the page */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 70vh;
+        padding: 20px;
+    }
+    
+    /* Add margin-top to the card container */
+    .form-container {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        margin-top: 90px;  /* Adjusted margin-top */
+    }
+
+    .form-card {
+        opacity: 0;
+        visibility: hidden; /* Initially hide sections */
+        position: absolute; /* Remove them from the normal flow */
+        transition: opacity 0.5s ease-in-out, visibility 0s 0.5s; /* Delay visibility change to sync with opacity */
+    }
+    
+    .form-card.active {
+        opacity: 1;
+        visibility: visible; /* Make the active section visible */
+        position: relative; /* Return it to the normal flow */
+        transition: opacity 0.5s ease-in-out, visibility 0s 0s; /* Reset visibility delay for active section */
+    }
+    
+    h2, h3 {
+        text-align: center;
+    }
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;  /* Ensure proper padding for text visibility */
+        font-size: 16px;  /* Adjust font size for better readability */
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-sizing: border-box;  /* Prevent overflow or text cutoff */
+        height: auto;  /* Allow the height to adjust naturally */
+        line-height: 1.5;  /* Set appropriate line-height for readability */
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;  /* Ensure the label is displayed correctly */
+        padding-bottom: 5px;  /* Provide space between label and select field */
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        color: white;
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        color: white;
+    }
+    
+    .btn:hover {
+        opacity: 0.9;
+    }
+    
+    .btn:focus {
+        outline: none;
+    }    
+    .remove-icon {
+        margin-left: 10px;
+        cursor: pointer;
+        color: red;
+        font-weight: bold;
+    }
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    
+    .interests-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .interest-card {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 150px;  /* Adjust width to fit design */
+        text-align: center;
+    }
+    .interest-section-card {
+        margin-top: 200px;  /* Adds 100px space above the card */
+    }
+    
+    .interest-card.selected {
+        background-color: #007bff;
+        color: white;
+    }
+    .selected-interests {
+        display: flex;
+        flex-wrap: wrap;  /* Allow wrapping of items if necessary */
+        gap: 10px;  /* Adjust spacing between items */
+        padding: 10px 0;  /* Add padding for better visual spacing */
+    }
+    
+    .selected-interests .interest-item {
+        padding: 5px;
+        background-color: #f1f1f1;
+        border-radius: 3px;
+        margin-right: 10px; /* Space out items horizontally */
+        display: inline-flex; /* Ensure items are in a row */
+        align-items: center; /* Vertically center the content */
+    } 
+    .remove-icon {
+        margin-left: 5px;
+        cursor: pointer;
+        color: red;
+    }
+    
+    .fas {
+        margin-right: 5px;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+</style>
+<form action="{% url 'onboarding' %}" method="POST" id="onboardingForm">
+    {% csrf_token %}
+<div class="container mt-5">
+    <div class="form-container">
+        <!-- Section 1: Welcome message and Are you a student? -->
+        <div class="form-card active" id="section-1">
+            <div class="card first-section-card">
+                <div class="card-body">
+                    <h2>Welcome to the Platform!</h2>
+                    <p>Let's get to know you a little better.</p>
+
+                    <div class="form-group">
+                        <label for="is_student">Are you a student?</label>
+                        <select class="form-control" id="is_student" name="is_student">
+                            <option value="True">Yes</option>
+                            <option value="False">No</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="nextSection()">
+                        <i class="fas fa-arrow-right"></i> Next
+                    </button>
+                </div>
+            </div>
+        </div>
+
+                <!-- Section 2: Interests -->
+                <div class="form-card" id="section-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Select Your Interests</h3>
+                            <p>Select up to 5 interests:</p>
+                            <div class="interests-grid">
+                                {% for interest in interests %}
+                                    <div class="interest-card" data-id="{{ interest.id }}" onclick="toggleInterest(this)">
+                                        <i class="{{ interest.icon }}"></i>
+                                        <span>{{ interest.name }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="selected-interests">
+                                <h5>Selected Interests:</h5>
+                                <div id="selectedInterestsList"></div>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="prevSection()">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="nextSection()">
+                                    <i class="fas fa-arrow-right"></i> Next
+                                </button>
+                            </div>
+                            <input type="hidden" id="selectedInterestsInput" name="interests" value="">
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Section 3: Goal -->
+        <div class="form-card" id="section-3">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Goal</h3>
+                    <div class="form-group">
+                        <label for="goal">What is your goal?</label>
+                        <select class="form-control" id="goal" name="goal" required>
+                            <option value="knowledge">To expand my knowledge and skills</option>
+                            <option value="entertainment">For personal enjoyment and relaxation</option>
+                            <option value="education">To enhance my academic understanding and performance</option>
+                            <option value="career">To improve my career prospects and professional growth</option>
+                            <option value="social_interaction">To engage with and learn from others</option>
+                            <option value="personal_growth">For personal growth and self-development</option>
+                        </select>                        
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="prevSection()">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm"  onclick="submitForm()">
+                            <i class="fas fa-check-circle"></i> Complete Onboarding
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form> 
+
+
+<script>
+    let currentSection = 1;
+    const totalSections = 3;
+
+    // Move to the next section
+    function nextSection() {
+        if (currentSection < totalSections) {
+            currentSection++;
+            updateFormSections();
+        }
+    }
+
+    // Move to the previous section
+    function prevSection() {
+        if (currentSection > 1) {
+            currentSection--;
+            updateFormSections();
+        }
+    }
+
+    // Update form sections visibility
+    function updateFormSections() {
+        // Hide all sections
+        for (let i = 1; i <= totalSections; i++) {
+            document.getElementById(`section-${i}`).classList.remove('active');
+        }
+
+        // Show the current section
+        document.getElementById(`section-${currentSection}`).classList.add('active');
+    }
+
+    // Array to keep track of selected interests
+    let selectedInterests = [];
+
+    // Toggle interest selection
+    function toggleInterest(interestDiv) {
+        const interestId = interestDiv.getAttribute("data-id");
+
+        // Toggle selection state
+        if (interestDiv.classList.contains("selected")) {
+            interestDiv.classList.remove("selected");
+            selectedInterests = selectedInterests.filter(i => i.id !== interestId);
+        } else {
+            if (selectedInterests.length < 5) {
+                interestDiv.classList.add("selected");
+                selectedInterests.push({ id: interestId, name: interestDiv.querySelector("span").textContent });
+            } else {
+                alert("You can select only 5 interests.");
+            }
+        }
+
+        updateSelectedInterestsDisplay();
+    }
+
+    // Update the display of selected interests
+    function updateSelectedInterestsDisplay() {
+        const selectedInterestsList = document.getElementById("selectedInterestsList");
+        selectedInterestsList.innerHTML = '';  // Clear the current list
+
+        selectedInterests.forEach(interest => {
+            const interestDiv = document.createElement("div");
+            interestDiv.classList.add("interest-item");
+            interestDiv.textContent = interest.name;
+
+            // Create a remove icon for each selected interest
+            const removeIcon = document.createElement("span");
+            removeIcon.textContent = "X";
+            removeIcon.classList.add("remove-icon");
+            removeIcon.onclick = () => {
+                selectedInterests = selectedInterests.filter(i => i.id !== interest.id);
+                updateSelectedInterestsDisplay();
+                document.querySelector(`[data-id="${interest.id}"]`).classList.remove("selected");
+            };
+
+            interestDiv.appendChild(removeIcon);
+            selectedInterestsList.appendChild(interestDiv);
+        });
+
+        // Ensure the hidden input name matches the field in OnboardingForm
+    document.getElementById("selectedInterestsInput").name = "interests";
+    }
+
+    // Function to submit the form when "Complete Onboarding" button is clicked
+    function submitForm() {
+        // Ensure that the selected interests are populated before submitting
+        const selectedInterestsInput = document.getElementById("selectedInterestsInput");
+        selectedInterestsInput.value = selectedInterests.map(i => i.id).join(",");
+
+        // Optionally, validate form here if needed before submission
+
+        document.querySelector('form').submit(); // Manually submit the form
+    }
+</script>
+
+
+{% endblock %}
+
+
+
+
+{% block footer %}
+<!-- Footer Bottom -->
+<div style="background: rgba(0, 0, 0, 0.85); margin-top: 320px" class="text-white text-center py-3">  <!-- Semi-transparent black -->
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+
+{% endblock footer %}

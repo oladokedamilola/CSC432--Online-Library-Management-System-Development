@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="{% url 'home' %}">Online Library Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endblock nav %}
+
+{% block content %}
+<style>
+    /* Center the container on the page */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    padding: 20px;
+}
+
+/* Add margin-top to the card container and reduce width */
+.form-container {
+    width: 100%;
+    max-width: 500px;  /* Reduced width */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    margin-top: 50px;  /* Adjusted margin-top */
+}
+
+/* Make sure form-card is centered and visible */
+.form-card {
+    opacity: 0;
+    visibility: hidden; /* Initially hide sections */
+    position: absolute; /* Remove them from the normal flow */
+    transition: opacity 0.5s ease-in-out, visibility 0s 0.5s; /* Delay visibility change to sync with opacity */
+}
+
+.form-card.active {
+    opacity: 1;
+    visibility: visible; /* Make the active section visible */
+    position: relative; /* Return it to the normal flow */
+    transition: opacity 0.5s ease-in-out, visibility 0s 0s; /* Reset visibility delay for active section */
+}
+
+/* Add some styling to headings and form controls */
+h2, h3 {
+    text-align: center;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;  /* Ensure proper padding for text visibility */
+    font-size: 16px;  /* Adjust font size for better readability */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-sizing: border-box;  /* Prevent overflow or text cutoff */
+    height: auto;  /* Allow the height to adjust naturally */
+    line-height: 1.5;  /* Set appropriate line-height for readability */
+}
+
+/* Button Styling */
+.btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn:focus {
+    outline: none;
+}
+
+</style>
+<form action="{% url 'onboarding_step1' %}" method="POST">
+    {% csrf_token %}
+<div class="container mt-5">
+    <div class="form-container">
+        <div class="form-card active" id="section-1">
+            <div class="card first-section-card">
+                <div class="card-body">
+                    <h2>Welcome to the Platform!</h2>
+                    <p>Let's get to know you a little better.</p>
+
+                    <form action="{% url 'onboarding_step1' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="is_student">Are you a student?</label>
+                            <select class="form-control" id="is_student" name="is_student">
+                                <option value="True">Yes</option>
+                                <option value="False">No</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-arrow-right"></i> Next
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+{% endblock content %}
+
+
+
+{% block footer %}
+<!-- Footer Bottom -->
+<div style="background: rgba(0, 0, 0, 0.85); margin-top: 150px" class="text-white text-center py-3">  <!-- Semi-transparent black -->
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+
+{% endblock footer %}
