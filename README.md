@@ -173,17 +173,3 @@ For any questions or suggestions, feel free to contact:
 - [Bootstrap](https://getbootstrap.com/) - A front-end framework for responsive web design.
 
 ```
-
-### Key sections of the `README.md`:
-1. **Project Image**: The image just under the title (`![Project Image](images/project-image.png)`) will need to be placed in the `images` folder or updated with the correct image path.
-2. **Overview**: A brief description of the project, highlighting its features and benefits.
-3. **Features**: A bullet-point list of the main features of the application.
-4. **Prerequisites**: The software you need to run the project (Python, Django, etc.).
-5. **Setup Instructions**: Step-by-step guide to get the project up and running.
-6. **Usage**: Basic usage instructions for interacting with the application.
-7. **File Structure**: An overview of the project structure for better understanding.
-8. **Contributing**: Guidelines for contributing to the project.
-9. **License**: The project's licensing information (you can adjust this based on your actual license).
-10. **Contact**: How users can reach out for questions or contributions.
-
-Make sure to adjust the image path and contact information according to your actual project and details.
