@@ -1,6 +1,6 @@
 # Book Management System
 
-![Project Image](images/project-image.png)
+![Project Image](https://github.com/oladokedamilola/CSC432--Online-Library-Management-System-Development/blob/main/hero.jpg?raw=true)
 
 ## Overview
 
@@ -43,7 +43,7 @@ Before setting up the project, make sure you have the following installed:
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/book-management-system.git
+git clone https://github.com/oladokedamilola/book-management-system.git
 cd book-management-system
 
 ```
@@ -162,8 +162,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For any questions or suggestions, feel free to contact:
 
-- **Your Name** - [your.email@example.com](mailto:your.email@example.com)
-- **GitHub** - [https://github.com/yourusername](https://github.com/yourusername)
+- **Your Name** - [your.email@example.com](mailto:your.oladokedamilola7@gmail.com)
+- **GitHub** - [https://github.com/yourusername](https://github.com/oladokedamilola)
 
 ---
 
