@@ -1,4 +1,3 @@
-```markdown
 # Book Management System
 
 ![Project Image](images/project-image.png)
@@ -41,9 +40,12 @@ Before setting up the project, make sure you have the following installed:
 
 ### 1. Clone the Repository
 
+Clone the repository to your local machine:
+
 ```bash
 git clone https://github.com/yourusername/book-management-system.git
 cd book-management-system
+
 ```
 
 ### 2. Create a Virtual Environment
