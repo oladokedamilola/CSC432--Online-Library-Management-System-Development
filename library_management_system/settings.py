@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'mybag',
-    'returns',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +62,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
+LOGIN_URL = 'login'  # Name of your login page
+LOGIN_REDIRECT_URL = 'home'  # Fallback redirect if no 'next' is specified
+
+# Authentication settings
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+)
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",  
@@ -132,7 +140,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-LOGIN_URL = '/librarian/login/'  # Update this to match the correct URL
+LOGIN_URL = '/accounts/login/'  # Update this to match the correct URL
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

@@ -3,57 +3,341 @@
 
 {% block title %} Home {% endblock title %}
 
+{% block styles %}
+<style>
+    /* Carousel Section Styling */
+    #messageCarousel {
+        position: relative;
+        overflow: hidden;
+        background-color: #f8f9fa; /* Light background for contrast */
+        border-radius: 0.5rem; /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .carousel-item {
+        transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transitions */
+    }
+
+    .carousel-item h2 {
+        font-size: 2rem; /* Responsive heading size */
+    }
+
+    .carousel-item p {
+        font-size: 1.2rem; /* Responsive paragraph size */
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .carousel-item h2 {
+            font-size: 1.5rem; /* Smaller heading size on mobile */
+        }
+
+        .carousel-item p {
+            font-size: 1rem; /* Smaller paragraph size on mobile */
+        }
+    }
+
+    /* Global Styles */
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        background: url('{% static "hero.jpg" %}') no-repeat center center;
+        background-size: cover;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-section .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+
+    .hero-section .text-white {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Carousel Styles */
+    .carousel-item img {
+        max-height: 400px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    /* Featured Books Section */
+    .card {
+        margin-bottom: 30px;
+    }
+
+    .card img {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Categories Section */
+    .card .fas {
+        color: #007bff; /* Bootstrap Primary Color */
+    }
+
+    /* User Reviews Section */
+    .user-review-card {
+        margin-bottom: 20px;
+    }
+
+    /* Events & News Section */
+    .card-body p {
+        margin: 0;
+    }
+
+    /* Library Services Section */
+    .library-service-card {
+        margin-bottom: 30px;
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.5rem; /* Adjust font size for smaller screens */
+        }
+
+        .hero-section p {
+            font-size: 1.25rem; /* Adjust font size for smaller screens */
+        }
+
+        .carousel-item img {
+            max-height: 300px; /* Adjust height for smaller screens */
+        }
+
+        .card img {
+            height: 150px; /* Adjust height for smaller screens */
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-section h1 {
+            font-size: 2rem; /* Further adjust for extra small screens */
+        }
+
+        .hero-section p {
+            font-size: 1rem; /* Further adjust for extra small screens */
+        }
+    }
+</style>
+{% endblock styles %}
+
 {% block content %}
-    <div class="hero-section text-center w-100" style="background: url('{% static 'hero.jpg' %}') no-repeat center center; background-size: cover; height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <!-- Hero Section with Full-Image Backdrop -->
+    <div class="hero-section text-center w-100" data-aos="fade-up">
+        <!-- Full Image Backdrop -->
+        <div class="overlay"></div>
+        <!-- Text content on top of the backdrop -->
         <div class="text-white">
             <h1 class="display-4">Welcome to the Online Library Management System</h1>
             <p class="lead">Your one-stop solution for managing library resources efficiently and effectively.</p>
-            {% comment %} <a href="#" class="btn btn-primary btn-lg">Join Now</a> {% endcomment %}
         </div>
     </div>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col text-center">
-                <h1>Explore Our Features</h1>
+    <!-- Encouraging Message Section Carousel -->
+    <div id="messageCarousel" class="carousel slide mt-5 mb-5 container" data-ride="carousel">
+        <!-- Carousel Indicators -->
+        <ol class="carousel-indicators">
+            <li data-target="#messageCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#messageCarousel" data-slide-to="1"></li>
+            <li data-target="#messageCarousel" data-slide-to="2"></li>
+        </ol>
+
+        <!-- Carousel Inner (Slides) -->
+        <div class="carousel-inner">
+            <!-- First Slide -->
+            <div class="carousel-item active">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="display-5">Discover the Joy of Reading</h2>
+                        <p class="lead">Books open doors to new worlds and endless possibilities. Dive into our collection, whether for education or pleasure, and enrich your mind. There's a story waiting for everyone—start yours today!</p>
+                        <a href="{% url 'books' %}" class="btn btn-primary btn-lg">Browse Our Collection</a>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <img src="{% static 'reading_image.jpg' %}" alt="Person Reading" class="img-fluid rounded" style="max-height: 400px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Slide -->
+            <div class="carousel-item">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="display-5">Unleash Your Imagination</h2>
+                        <p class="lead">Every book you read is a new adventure. Explore genres from mystery to fantasy, and let your imagination run wild as you travel to far-off lands and unravel intriguing tales.</p>
+                        <a href="{% url 'genre_books' %}" class="btn btn-primary btn-lg">Explore Genres</a>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <img src="{% static 'imagination_image.jpg' %}" alt="Imagination" class="img-fluid rounded" style="max-height: 400px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third Slide -->
+            <div class="carousel-item">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="display-5">Knowledge is Power</h2>
+                        <p class="lead">Expand your understanding with our vast collection of educational resources. From science and history to self-development, the library is your gateway to wisdom and success.</p>
+                        <a href="{% url 'books' %}" class="btn btn-primary btn-lg">Start Learning</a>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <img src="{% static 'knowledge_image.jpg' %}" alt="Knowledge" class="img-fluid rounded" style="max-height: 400px;">
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row mt-5">
-            <div class="col-md-4">
+
+        <!-- Carousel Controls -->
+        <a class="carousel-control-prev" href="#messageCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#messageCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+    
+    <!-- Featured Books Section -->
+<div class="container mt-5" id="featured-books" data-aos="zoom-in">
+    <h2 class="text-center">Featured Books</h2>
+    <div class="row mt-4 justify-content-center"> <!-- Added justify-content-center -->
+        <!-- First Featured Book -->
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="card h-100"> <!-- Added h-100 for equal height -->
+                <img class="card-img-top" src="{% static '1.jpg' %}" alt="The Great Gatsby" style="object-fit: contain; height: 250px; width: 100%;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">The Great Gatsby</h5>
+                    <p class="card-text">Author: F. Scott Fitzgerald</p>
+                </div>
+            </div>
+        </div>
+        <!-- Second Featured Book -->
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100"> <!-- Added h-100 for equal height -->
+                <img class="card-img-top" src="{% static 'kill.jpg' %}" alt="To Kill a Mockingbird" style="object-fit: contain; height: 250px; width: 100%;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">To Kill a Mockingbird</h5>
+                    <p class="card-text">Author: Harper Lee</p>
+                </div>
+            </div>
+        </div>
+        <!-- Third Featured Book -->
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+            <div class="card h-100"> <!-- Added h-100 for equal height -->
+                <img class="card-img-top" src="{% static '3.jpg' %}" alt="Pride and Prejudice" style="object-fit: contain; height: 250px; width: 100%;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Pride and Prejudice</h5>
+                    <p class="card-text">Author: Jane Austen</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- Categories Section -->
+    <div class="container mt-5" data-aos="fade-up">
+        <h2 class="text-center">Explore Our Categories</h2>
+        <div class="row mt-4">
+            <!-- Category 1 -->
+            <div class="col-md-3" data-aos="flip-left" data-aos-delay="100">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Manage Readers</h5>
-                        <p class="card-text">Add, update, or remove readers from the system.</p>
-                        <a href="{% url 'reader_manage' %}" class="btn btn-primary">Go to Readers</a>
+                        <i class="fas fa-book fa-3x"></i>
+                        <h5 class="card-title">Fiction</h5>
+                        <p class="card-text">Explore imaginative tales and fictional worlds.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <!-- Category 2 -->
+            <div class="col-md-3" data-aos="flip-left" data-aos-delay="100">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Browse Books</h5>
-                        <p class="card-text">Explore our extensive collection of books.</p>
-                        <a href="{% url 'books' %}" class="btn btn-primary">Go to Books</a>
+                        <i class="fas fa-history fa-3x"></i>
+                        <h5 class="card-title">History</h5>
+                        <p class="card-text">Dive into the past and uncover fascinating stories.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <!-- Category 3 -->
+            <div class="col-md-3" data-aos="flip-left" data-aos-delay="100">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Manage Your Bag</h5>
-                        <p class="card-text">View and manage books in your bag.</p>
-                        <a href="{% url 'mybag' %}" class="btn btn-primary">Go to MyBag</a>
+                        <i class="fas fa-graduation-cap fa-3x"></i>
+                        <h5 class="card-title">Education</h5>
+                        <p class="card-text">Access a wealth of knowledge and learning resources.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Category 4 -->
+            <div class="col-md-3" data-aos="flip-left" data-aos-delay="100">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-heart fa-3x"></i>
+                        <h5 class="card-title">Romance</h5>
+                        <p class="card-text">Experience love stories that warm the heart.</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-5">
-            <div class="col-md-12">
+    </div>
+
+    
+    <!-- Library Services Section -->
+    <div class="container mt-5" data-aos="fade-up">
+        <h2 class="text-center">Library Services</h2>
+        <div class="row mt-4">
+            <!-- Service 1 -->
+            <div class="col-md-3 library-service-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Returns</h5>
-                        <p class="card-text">Manage the return of books efficiently.</p>
-                        <a href="{% url 'returns' %}" class="btn btn-primary">Go to Returns</a>
+                    <div class="card-body">
+                        <h5 class="card-title">Online Catalog</h5>
+                        <p class="card-text">Browse our extensive catalog from the comfort of your home.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service 2 -->
+            <div class="col-md-3 library-service-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">E-Books</h5>
+                        <p class="card-text">Access a wide selection of e-books anytime, anywhere.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service 3 -->
+            <div class="col-md-3 library-service-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Community Events</h5>
+                        <p class="card-text">Participate in various community events and workshops.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service 4 -->
+            <div class="col-md-3 library-service-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Research Assistance</h5>
+                        <p class="card-text">Get help with research projects and finding resources.</p>
                     </div>
                 </div>
             </div>

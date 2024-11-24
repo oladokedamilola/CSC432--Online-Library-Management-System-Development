@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="{% url 'home' %}">Online Library Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endblock nav %}
+
+{% block content %}
+<style>
+    /* Center the container on the page */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 20px;
+    }
+
+    /* Form container styling */
+    .form-container {
+        width: 100%;
+        max-width: 500px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        margin-top: 50px;
+    }
+
+    /* Card styling */
+    .card {
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    /* Grid for interests */
+    .interests-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* Styling each interest card */
+    .interest-card {
+        padding: 15px;
+        text-align: center;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .interest-card:hover {
+        background-color: #f0f0f0;
+        border-color: #007bff;
+    }
+
+    .interest-card.selected {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Display selected interests horizontally */
+    .selected-interests {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .selected-interests div {
+        background-color: #007bff;
+        color: white;
+        padding: 8px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+    }
+
+    .selected-interests div .remove-icon {
+        margin-left: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: white;
+    }
+
+    /* Button styling */
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .btn:focus {
+        outline: none;
+    }
+</style>
+
+<form action="{% url 'onboarding_step2' %}" method="POST">
+    {% csrf_token %}
+    <div class="container mt-5">
+    <div class="form-container">
+        <div class="form-card" id="section-2">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Select Your Interests</h3>
+                    <p>Select up to 5 interests:</p>
+                    <div class="interests-grid">
+                        {% for interest in interests %}
+                        <div class="interest-card" data-id="{{ interest.id }}" onclick="toggleInterest(this)">
+                            <i class="{{ interest.icon }}"></i>
+                            <span>{{ interest.name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="selected-interests" id="selectedInterestsList"></div>
+
+                    <div class="form-buttons">
+                        <a href="{% url 'onboarding_step1' %}" class="btn btn-secondary btn-sm mr-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        
+                        <button type="button" class="btn btn-primary btn-sm" onclick="nextSection()">
+                            <i class="fas fa-arrow-right"></i> Next
+                        </button>
+                    </div>
+                    <input type="hidden" id="selectedInterestsInput" name="interests" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+<script>
+    let selectedInterests = [];
+
+    // Toggle interest selection
+    function toggleInterest(interestDiv) {
+        const interestId = interestDiv.getAttribute("data-id");
+
+        // Toggle selection state
+        if (interestDiv.classList.contains("selected")) {
+            interestDiv.classList.remove("selected");
+            selectedInterests = selectedInterests.filter(i => i.id !== interestId);
+        } else {
+            if (selectedInterests.length < 5) {
+                interestDiv.classList.add("selected");
+                selectedInterests.push({ id: interestId, name: interestDiv.querySelector("span").textContent });
+            } else {
+                alert("You can select only 5 interests.");
+            }
+        }
+
+        updateSelectedInterestsDisplay();
+    }
+
+    // Update the display of selected interests
+    function updateSelectedInterestsDisplay() {
+        const selectedInterestsList = document.getElementById("selectedInterestsList");
+        selectedInterestsList.innerHTML = '';  // Clear the current list
+
+        selectedInterests.forEach(interest => {
+            const interestDiv = document.createElement("div");
+            interestDiv.textContent = interest.name;
+
+            // Create a remove icon for each selected interest
+            const removeIcon = document.createElement("span");
+            removeIcon.textContent = "X";
+            removeIcon.classList.add("remove-icon");
+            removeIcon.onclick = () => {
+                selectedInterests = selectedInterests.filter(i => i.id !== interest.id);
+                updateSelectedInterestsDisplay();
+                document.querySelector(`[data-id="${interest.id}"]`).classList.remove("selected");
+            };
+
+            interestDiv.appendChild(removeIcon);
+            selectedInterestsList.appendChild(interestDiv);
+        });
+
+        // Update the hidden input value
+        document.getElementById("selectedInterestsInput").value = selectedInterests.map(i => i.id).join(",");
+    }
+
+// Function to handle the form submission when "Next" button is clicked
+function nextSection() {
+    if (selectedInterests.length < 3) {
+        // Show validation error if fewer than 3 interests are selected
+        alert("Please select at least 3 interests.");
+        return;
+    }
+
+    // Update the hidden input value with selected interest IDs
+    const selectedInterestsInput = document.getElementById("selectedInterestsInput");
+    selectedInterestsInput.value = selectedInterests.map(i => i.id).join(",");
+
+    // Submit the form manually
+    document.querySelector('form').submit();
+}
+
+
+
+    function prevSection() {
+        // Logic for going to the previous section (no form submission)
+    }
+</script>
+
+<script>
+    function prevSection() {
+        // Find the currently active form card
+        const currentCard = document.querySelector('.form-card.active');
+    
+        if (currentCard) {
+            // Find the previous form card
+            const prevCard = currentCard.previousElementSibling;
+    
+            if (prevCard && prevCard.classList.contains('form-card')) {
+                // Remove 'active' class from the current card
+                currentCard.classList.remove('active');
+    
+                // Add 'active' class to the previous card
+                prevCard.classList.add('active');
+            }
+        }
+    }
+    
+</script>
+
+
+{% endblock content %}
+
+{% block footer %}
+<div style="background: rgba(0, 0, 0, 0.85); margin-top: 150px" class="text-white text-center py-3">
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+{% endblock footer %}

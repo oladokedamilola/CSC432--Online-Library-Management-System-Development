@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px; margin-bottom:200px;">
+    <h1 class="text-center mb-4">Genres</h1>
+    <div class="row">
+        {% for genre in genres %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <!-- Display the icon if it exists -->
+                        {% if genre.icon %}
+                            <i class="{{ genre.icon }}" style="font-size: 40px;"></i>
+                        {% endif %}
+                        
+                        <h5 class="card-title mt-3">
+                            <a href="{% url 'genre_books' genre.id %}">{{ genre.name }}</a>
+                        </h5>
+                        
+                        <!-- Display the description if it exists -->
+                        {% if genre.description %}
+                            <p class="card-text">{{ genre.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center">No genres available at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

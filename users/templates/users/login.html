@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .flash-message-container {
+        position: fixed;
+        top: 60px; /* Adjust this to match the height of your navbar */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%; /* Set a standard width */
+        max-width: 600px; /* Prevent it from being too wide */
+        z-index: 1050; /* Ensure it appears above other elements */
+    }
+    .flash-message-wrapper {
+        padding: 10px;
+    }
+    .alert {
+        margin: 0 auto;
+        text-align: center;
+        width: 100%;
+    }
+</style>
+
+<div class="container mb-5">
+    <h3 class="text-center mb-5">Login</h3>
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="form-group">
+            <label for="id_username">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="text-danger mt-1">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    
+        <div class="form-group">
+            <label for="id_password">Password</label>
+            <div class="input-group">
+                {{ form.password }}
+                <div class="input-group-append">
+                    <span class="input-group-text toggle-password" onclick="togglePassword('id_password')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+            {% if form.password.errors %}
+                <div class="text-danger mt-1">
+                    {% for error in form.password.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    
+        <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+    </form>
+    <div class="text-center mt-3">
+        <p>
+            Don't have an account? <a href="{% url 'register' %}">Register here</a>.
+        </p>
+    </div>
+    
+    
+</div>
+
+<script>
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = field.nextElementSibling.querySelector('i');
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+</script>
+<script>
+    // Auto-hide flash message after 7 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.flash-message-wrapper .alert').forEach(function(alert) {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+            setTimeout(() => alert.remove(), 150); // Remove from DOM after fade effect
+        });
+    }, 7000);
+</script>
+
+<style>
+    .container {
+        max-width: 500px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-primary {
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 4px;
+    }
+
+    .input-group-append {
+        cursor: pointer;
+    }
+
+    .toggle-password {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block footer %}
+ <!-- Footer Bottom -->
+ <div style="background: rgba(0, 0, 0, 0.85); margin-top: 60px" class="text-white text-center py-3">  <!-- Semi-transparent black -->
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+
+{% endblock footer %}

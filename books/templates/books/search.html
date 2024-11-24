@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<style>
+  /* Card Styling */
+  .card-img-top {
+    object-fit: contain;
+    height: 200px; /* Reduced height */
+    width: 100%;
+  }
+
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 10px; /* Reduced padding */
+    text-align: center;
+  }
+
+  .card-title {
+    font-size: 1.1rem; /* Slightly smaller font size */
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .card-text {
+    font-size: 0.85rem; /* Slightly smaller text size */
+    margin-bottom: 8px;
+  }
+
+  /* Adjust Layout for Smaller Cards */
+  .row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  /* Adjust for Smaller Screens */
+  @media (max-width: 768px) {
+    .content {
+      margin-top: 60px;
+    }
+  }
+</style>
+
+<div class="container" style="margin-top: 180px; margin-bottom:200px;">
+  <h2 class="text-center mb-4">Search Books</h2>
+  
+  <!-- Search Form -->
+  <form method="get" action="{% url 'search_books' %}">
+    <div class="form-group d-flex justify-content-center flex-wrap">
+      <input type="text" name="q" placeholder="Search for books..." 
+             class="form-control mr-2 mb-2 mb-md-0" style="width: 40%; min-width: 200px;" 
+             value="{{ query }}">
+      
+      <!-- Category Filter -->
+      <select name="category" class="form-control mr-2 mb-2 mb-md-0" style="width: 20%; min-width: 150px;">
+        <option value="">All Categories</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category %}selected{% endif %}>
+            {{ category.name }}
+          </option>
+        {% endfor %}
+      </select>
+      
+      <!-- Genre Filter -->
+      <select name="genre" class="form-control mr-2 mb-2 mb-md-0" style="width: 20%; min-width: 150px;">
+        <option value="">All Genres</option>
+        {% for genre in genres %}
+          <option value="{{ genre.id }}" {% if genre.id|stringformat:"s" == selected_genre %}selected{% endif %}>
+            {{ genre.name }}
+          </option>
+        {% endfor %}
+      </select>
+      
+      <button type="submit" class="btn btn-primary" style="background-color: #007BFF; border-color: #0056b3;">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+  </form>
+  
+  <!-- Search Results -->
+  <div class="mt-5">
+    {% if query or selected_category or selected_genre %}
+      {% if books %}
+        <h4 class="mb-4">Search Results:</h4>
+        <div class="row">
+          {% for book in books %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:"100" }}">
+              <div class="card h-100">
+                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="card-img-top">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">{{ book.title }}</h5>
+                  <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
+                  <p class="card-text"><strong>Genre:</strong> {{ book.genre.name }}</p>
+                  <p class="card-text">{{ book.description|truncatewords:15 }}</p>
+                  <div class="d-flex flex-column mt-auto">
+                    <a href="{% url 'book_detail' book.id %}" class="btn btn-primary btn-sm mb-2">View Details</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <h4 class="text-center text-muted">No books found matching your criteria.</h4>
+      {% endif %}
+    {% else %}
+      <h4 class="text-center text-muted">Start searching for books using the form above.</h4>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<div style="background: rgba(0, 0, 0, 0.85); margin-top: auto" class="text-white text-center py-3">
+  <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+{% endblock %}

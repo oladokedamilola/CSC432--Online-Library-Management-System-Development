@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 100px; padding-left: 0; padding-right: 0;">
+  <h2 class="text-center mb-4">Reading: {{ book.title }}</h2>
+
+  <!-- Book Metadata with Cover Image -->
+  <div class="row mb-4">
+    <!-- Cover Image -->
+    <div class="col-md-3 text-center">
+      {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}" alt="Cover Image" class="img-fluid rounded" style="max-width: 150px;">
+      {% else %}
+        <img src="https://via.placeholder.com/150" alt="No Cover Image" class="img-fluid rounded" style="max-width: 150px;">
+      {% endif %}
+    </div>
+
+    <!-- Book Metadata -->
+    <div class="col-md-9">
+      <p><strong>Author:</strong> {{ book.author }}</p>
+      <p><strong>Genre:</strong> {{ book.genre.all|join:", " }}</p>
+      <p><strong>Category:</strong> {{ book.category.name }}</p>
+    </div>
+  </div>
+
+  <!-- Book Layout: Responsive Design -->
+  <div class="row flex-wrap-reverse" style="margin-left: 0; margin-right: 0;">
+    <!-- Page Navigation Sidebar (Left) -->
+    <div class="col-md-3 order-md-1 order-2" 
+         style="border-right: 1px solid #ddd; max-height: 600px; overflow-y: auto; padding-right: 15px; padding-left: 15px;">
+      <h4 class="text-center mt-3">Pages</h4>
+      <div class="card">
+        <div class="card-body">
+          <div class="page-grid" id="pageNavigation">
+            <!-- Page numbers will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Viewer (Right) -->
+    <div class="col-md-9 order-md-2 order-1">
+      <div id="pdfViewerContainer" class="text-center mt-3">
+        <div class="pdf-pages" id="pdfViewer"></div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="d-flex justify-content-between mt-4">
+        <button class="btn btn-primary" onclick="goToPage(currentPage - 1)" 
+                {% if currentPage == 1 %}disabled{% endif %}>Previous</button>
+        <button class="btn btn-primary" onclick="goToPage(currentPage + 1)" 
+                {% if currentPage == pdfDoc.numPages %}disabled{% endif %}>Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include PDF.js for rendering the PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+
+<script>
+  const pdfUrl = "{{ book.book_file.url }}";  // The URL of the PDF file
+  let currentPage = 1;
+  let pdfDoc = null;
+
+  // Loading the PDF document
+  function loadPDF() {
+    pdfjsLib.getDocument(pdfUrl).promise.then(function(doc) {
+      pdfDoc = doc;
+      renderPage(currentPage);
+
+      // Update page navigation links in a grid (Matrix-like)
+      const pageNav = document.getElementById("pageNavigation");
+      pageNav.innerHTML = '';  // Clear existing page numbers
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const pageLink = document.createElement('a');
+        pageLink.classList.add('page-link');
+        pageLink.href = "javascript:void(0)";
+        pageLink.textContent = i;
+        pageLink.onclick = function() {
+          goToPage(i);
+        };
+        pageNav.appendChild(pageLink);
+      }
+
+      // Enable/Disable navigation buttons based on current page
+      updateNavigationButtons();
+    }).catch(function(error) {
+      console.error("Error loading PDF:", error);
+    });
+  }
+
+  // Rendering two pages at once (side-by-side)
+  function renderPage(pageNum) {
+    pdfDoc.getPage(pageNum).then(function(page1) {
+      pdfDoc.getPage(pageNum + 1).then(function(page2) {
+        const canvas1 = document.createElement('canvas');
+        const canvas2 = document.createElement('canvas');
+
+        const ctx1 = canvas1.getContext("2d");
+        const ctx2 = canvas2.getContext("2d");
+
+        const viewport1 = page1.getViewport({ scale: 1.5 });
+        const viewport2 = page2.getViewport({ scale: 1.5 });
+
+        // Adjust canvas sizes for side-by-side display
+        canvas1.height = viewport1.height;
+        canvas1.width = viewport1.width;
+        canvas2.height = viewport2.height;
+        canvas2.width = viewport2.width;
+
+        // Append canvases to display them side-by-side
+        const pdfViewer = document.getElementById("pdfViewer");
+        pdfViewer.innerHTML = ''; // Clear previous content
+        pdfViewer.appendChild(canvas1);
+        pdfViewer.appendChild(canvas2);
+
+        page1.render({
+          canvasContext: ctx1,
+          viewport: viewport1
+        });
+
+        page2.render({
+          canvasContext: ctx2,
+          viewport: viewport2
+        });
+
+        // Update the current page indicator
+        updateNavigationButtons();
+      });
+    });
+  }
+
+  // Page navigation (go to specific page)
+  function goToPage(pageNum) {
+    if (pageNum > 0 && pageNum <= pdfDoc.numPages - 1) { // Ensure we can render two pages
+      currentPage = pageNum;
+      renderPage(pageNum);
+    }
+  }
+
+  // Enable/Disable navigation buttons based on current page
+  function updateNavigationButtons() {
+    const prevBtn = document.querySelector('.btn-primary[onclick="goToPage(currentPage - 1)"]');
+    const nextBtn = document.querySelector('.btn-primary[onclick="goToPage(currentPage + 1)"]');
+
+    // Enable/Disable Previous button
+    if (currentPage === 1) {
+      prevBtn.disabled = true;
+    } else {
+      prevBtn.disabled = false;
+    }
+
+    // Enable/Disable Next button
+    if (currentPage >= pdfDoc.numPages - 1) {
+      nextBtn.disabled = true;
+    } else {
+      nextBtn.disabled = false;
+    }
+
+    // Highlight current page in the sidebar
+    const pageLinks = document.querySelectorAll('.page-link');
+    pageLinks.forEach(function(link) {
+      link.classList.remove('active');
+      if (parseInt(link.textContent) === currentPage) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  // Initialize PDF viewer
+  loadPDF();
+</script>
+
+{% endblock %}
+
+{% block footer %}
+<div style="background: rgba(0, 0, 0, 0.85); margin-top: 60px" class="text-white text-center py-3">
+  <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .card {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns for a matrix */
+    gap: 5px;
+    padding: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+    grid-auto-rows: 50px; /* Ensure rows are of fixed height */
+  }
+
+  .page-link {
+    display: block;
+    padding: 10px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .page-link:hover {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .page-link.active {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .pdf-pages {
+    display: flex;
+    gap: 20px;
+  }
+
+  .pdf-pages canvas {
+    flex: 1;
+    height: auto;
+  }
+
+  .btn-primary {
+    width: 48%;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .row {
+      flex-direction: column-reverse; /* Stack navigation below PDF viewer */
+    }
+
+    .col-md-3 {
+      max-height: none; /* Remove height restriction for sidebar */
+      border-right: none; /* Remove border on small screens */
+      margin-top: 20px; /* Add spacing */
+    }
+
+    .pdf-pages canvas {
+      width: 100%; /* Adjust canvas width for smaller screens */
+      height: auto; /* Maintain aspect ratio */
+    }
+
+    .btn-primary {
+      width: 100%; /* Full-width buttons on smaller screens */
+      margin-bottom: 10px;
+    }
+  }
+</style>
+{% endblock %}

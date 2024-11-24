@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="{% url 'home' %}">Online Library Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endblock nav %}
+
+{% block content %}
+<style>
+    #section-3 .form-card {
+        margin-top: 20px; /* Adjust top margin */
+        margin-bottom: 20px; /* Adjust bottom margin */
+    }
+    
+    /* Center the container on the page */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+        padding: 20px;
+    }
+    
+    /* Adjust form container to have a smaller width */
+    .form-container {
+        width: 100%;
+        max-width: 500px; /* Reduce max-width for a smaller card */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        margin-top: 90px;  /* Adjusted margin-top */
+    }
+
+    .form-card {
+        opacity: 0;
+        visibility: hidden; /* Initially hide sections */
+        position: absolute; /* Remove them from the normal flow */
+        transition: opacity 0.5s ease-in-out, visibility 0s 0.5s; /* Delay visibility change to sync with opacity */
+    }
+    
+    .form-card.active {
+        opacity: 1;
+        visibility: visible; /* Make the active section visible */
+        position: relative; /* Return it to the normal flow */
+        transition: opacity 0.5s ease-in-out, visibility 0s 0s; /* Reset visibility delay for active section */
+    }
+    
+    h2, h3 {
+        text-align: center;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;  /* Ensure the label is displayed correctly */
+        padding-bottom: 5px;  /* Provide space between label and select field */
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;  /* Ensure proper padding for text visibility */
+        font-size: 16px;  /* Adjust font size for better readability */
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-sizing: border-box;  /* Prevent overflow or text cutoff */
+        height: auto;  /* Allow the height to adjust naturally */
+        line-height: 1.5;  /* Set appropriate line-height for readability */
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        color: white;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .btn:focus {
+        outline: none;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .fas {
+        margin-right: 5px;
+    }
+</style>
+
+<form action="{% url 'onboarding_step3' %}" method="POST">
+    {% csrf_token %}
+    <div class="container mt-5">
+        <div class="form-container">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Goal</h3>
+                    <div class="form-group">
+                        <label for="goal" class="font-weight-bold">What is your goal?</label>
+                        <select class="form-control form-control-lg" id="goal" name="goal" required>
+                            <option value="knowledge">Expand my knowledge and skills</option>
+                            <option value="entertainment">Personal enjoyment and relaxation</option>
+                            <option value="education">Enhance academic understanding</option>
+                            <option value="career">Improve career prospects</option>
+                            <option value="social_interaction">Engage with others</option>
+                            <option value="personal_growth">Personal growth</option>
+                        </select>
+                    </div>
+                    <div class="form-buttons text-center mt-4">
+                        <a href="{% url 'onboarding_step2' %}" class="btn btn-secondary btn-sm mr-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fas fa-check-circle"></i> Complete Onboarding
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function prevSection() {
+        // Find the currently active form card
+        const currentCard = document.querySelector('.form-card.active');
+    
+        if (currentCard) {
+            // Find the previous form card
+            const prevCard = currentCard.previousElementSibling;
+    
+            if (prevCard && prevCard.classList.contains('form-card')) {
+                // Remove 'active' class from the current card
+                currentCard.classList.remove('active');
+    
+                // Add 'active' class to the previous card
+                prevCard.classList.add('active');
+            }
+        }
+    }
+    
+</script>
+{% endblock content %}
+
+
+
+{% block footer %}
+<!-- Footer Bottom -->
+<div style="background: rgba(0, 0, 0, 0.85); margin-top: 200px" class="text-white text-center py-3">  <!-- Semi-transparent black -->
+    <p class="mb-0">&copy; 2024 Online Library Management System. All rights reserved.</p>
+</div>
+
+{% endblock footer %}
